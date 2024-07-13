@@ -28,9 +28,13 @@ echo "Enabling IPv6 on interface $INTERFACE..."
 sudo ip link set dev $INTERFACE up
 sudo sysctl -w net.ipv6.conf.$INTERFACE.disable_ipv6=0
 
-# Request IPv6 address and gateway using dhclient
-echo "Requesting IPv6 address and gateway for interface $INTERFACE..."
-sudo dhclient -6 -v $INTERFACE
+# Configure static IPv6 address and gateway
+IPV6_ADDRESS="2001:19f0:5801:0c6e:5400:05ff:fe04:4980/64"
+IPV6_GATEWAY="2001:19f0:5801:0c6e::1"
+
+echo "Configuring static IPv6 address and gateway for interface $INTERFACE..."
+sudo ip -6 addr add $IPV6_ADDRESS dev $INTERFACE
+sudo ip -6 route add default via $IPV6_GATEWAY dev $INTERFACE
 
 # Verify IPv6 configuration
 echo "Verifying IPv6 configuration..."
