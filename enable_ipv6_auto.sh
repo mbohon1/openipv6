@@ -23,6 +23,11 @@ if [ -z "$INTERFACE" ]; then
     exit 1
 fi
 
+# Enable IPv6 on the interface directly
+echo "Enabling IPv6 on interface $INTERFACE..."
+sudo ip link set dev $INTERFACE up
+sudo sysctl -w net.ipv6.conf.$INTERFACE.disable_ipv6=0
+
 # Request IPv6 address and gateway using dhclient
 echo "Requesting IPv6 address and gateway for interface $INTERFACE..."
 sudo dhclient -6 -v $INTERFACE
