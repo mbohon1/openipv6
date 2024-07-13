@@ -32,12 +32,24 @@ sudo sysctl -w net.ipv6.conf.$INTERFACE.disable_ipv6=0
 IPV6_ADDRESS="2001:19f0:5801:c6e:5400:5ff:fe04:4980/64"
 IPV6_GATEWAY="2001:19f0:5801:c6e::1"
 
+# Remove existing IPv6 address if it exists to avoid conflict
+echo "Removing existing IPv6 address if it exists..."
+sudo ip -6 addr del $IPV6_ADDRESS dev $INTERFACE
+
 echo "Configuring static IPv6 address and gateway for interface $INTERFACE..."
 sudo ip -6 addr add $IPV6_ADDRESS dev $INTERFACE
 sudo ip -6 route add default via $IPV6_GATEWAY dev $INTERFACE
 
-# Verify IPv6 configuration
+# Verify IPv6 configuration and connectivity to gateway
 echo "Verifying IPv6 configuration..."
 ip -6 addr show dev $INTERFACE
+
+echo "Checking connectivity to the gateway..."
+ping_result=$(ping6 -c 4 $IPV6_GATEWAY)
+if [[ $? -ne 0 ]]; then
+    echo "Failed to reach the gateway at $IPV6_GATEWAY."
+else
+    echo "Successfully reached the gateway at $IPV6_GATEWAY."
+fi
 
 echo "IPv6 configuration completed."
